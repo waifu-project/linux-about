@@ -26,7 +26,7 @@ class MenuItem extends StatelessWidget {
           horizontal: 1,
         ),
         decoration: BoxDecoration(
-          color: isHover ? Colors.black12 : Colors.transparent,
+          color: isHover ? Color.fromRGBO(0, 0, 0, .08) : Colors.transparent,
           border: Border.all(
             width: 1,
             color: Colors.black12,

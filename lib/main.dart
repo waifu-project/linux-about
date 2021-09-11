@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:bitsdojo_window/bitsdojo_window.dart';
 import 'package:macwindowctl/macwindowctl.dart';
 
-import 'pages/overflow.dart';
 import 'widget/menu_item.dart';
 
 void main() {
@@ -28,6 +27,8 @@ class AboutApp extends StatefulWidget {
 }
 
 class _AboutAppState extends State<AboutApp> {
+  configToolbar _page = configToolbar.overflow;
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -77,18 +78,17 @@ class _AboutAppState extends State<AboutApp> {
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       ...Config.toolbar
-                                          .map(
-                                            (Map<String, dynamic> item) =>
-                                                MenuItem(
-                                              text: item['title'],
-                                              onTap: () {
-                                                configToolbar action =
-                                                    item['action'];
-                                                print(action);
-                                              },
-                                            ),
-                                          )
-                                          .toList(),
+                                          .map((Map<String, dynamic> item) {
+                                        return MenuItem(
+                                          isHover: item['action'] == _page,
+                                          text: item['title'],
+                                          onTap: () {
+                                            configToolbar action =
+                                                item['action'];
+                                            print(action);
+                                          },
+                                        );
+                                      }).toList(),
                                     ],
                                   ),
                                 ),
@@ -101,7 +101,9 @@ class _AboutAppState extends State<AboutApp> {
                     Expanded(
                       child: IndexedStack(
                         index: configToolbar.overflow.index,
-                        children: Config.toolbar.map((e) => e['page'] as Widget).toList(),
+                        children: Config.toolbar
+                            .map((e) => e['page'] as Widget)
+                            .toList(),
                       ),
                     ),
                   ],

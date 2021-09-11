@@ -1,5 +1,6 @@
 import 'package:about/common/io.dart';
 import 'package:about/common/logos.dart';
+import 'package:about/widget/overflow_item.dart';
 import 'package:flutter/material.dart';
 
 class OverflowPage extends StatefulWidget {
@@ -18,15 +19,17 @@ class _OverflowPageState extends State<OverflowPage> {
 
   String startupDisk = "";
 
+  String graphics = "";
+
   @override
   void initState() {
     super.initState();
-    KitIO.startupDisk;
     setState(() {
       release = KitIO.release;
       cpuModel = KitIO.cpuModel;
       memoryTotal = KitIO.memoryTotal;
       startupDisk = KitIO.startupDisk;
+      graphics = KitIO.graphics;
     });
   }
 
@@ -39,8 +42,7 @@ class _OverflowPageState extends State<OverflowPage> {
       child: Row(
         children: [
           Container(
-            // TODO width => window * .333
-            width: 180,
+            width: MediaQuery.of(context).size.width * .333,
             height: double.infinity,
             child: Center(
               child: Icon(
@@ -57,85 +59,19 @@ class _OverflowPageState extends State<OverflowPage> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  /// 操作系统
                   Text(
                     release['NAME'] ?? "",
                     style: TextStyle(
-                      fontSize: 24,
+                      fontSize: 42,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-
-                  /// 版本号
-                  Text.rich(
-                    TextSpan(
-                        text: "version",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: release['VERSION'] ?? "",
-                            style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                            ),
-                          )
-                        ]),
-                  ),
-
-                  /// CPU
-                  Text.rich(
-                    TextSpan(
-                        text: "processor",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: cpuModel,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                            ),
-                          )
-                        ]),
-                  ),
-
-                  /// CPU
-                  Text.rich(
-                    TextSpan(
-                        text: "memory",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: memoryTotal,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                            ),
-                          )
-                        ]),
-                  ),
-
-                  /// CPU
-                  Text.rich(
-                    TextSpan(
-                        text: "startup disk",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: startupDisk,
-                            style: TextStyle(
-                              fontWeight: FontWeight.w300,
-                            ),
-                          )
-                        ]),
-                  ),
-
-                  /// 显卡
-                  Text("Graphics"),
+                  OverflowItem(k: "version",v: release['VERSION'] ?? "",kBold: false,),
+                  SizedBox(height: 12,),
+                  OverflowItem(k: "processor", v: cpuModel),
+                  OverflowItem(k: "memory", v: memoryTotal),
+                  OverflowItem(k: "startup disk", v: startupDisk),
+                  OverflowItem(k: "graphics", v: graphics)
                 ],
               ),
             ),

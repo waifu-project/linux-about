@@ -6,6 +6,8 @@ import 'package:linux_system_info/linux_system_info.dart';
 
 import 'package:about/common/utils.dart';
 
+const unknown = "unknown";
+
 class KitIO {
   /// get release info file
   /// /etc/*release
@@ -40,10 +42,42 @@ class KitIO {
       var flag = element.split(" / ");
       return (flag.length >= 2);
     });
-    if (rootfs.isEmpty) return "";
+    if (rootfs.isEmpty) return unknown;
     var index = rootfs.indexOf(" ");
-    if (index <= -1) return "";
+    if (index <= -1) return unknown;
     var result = rootfs.substring(0, index);
     return result;
+  }
+
+  /// 获取显卡
+  static get graphics {
+    var result = Process.runSync("lspci", []);
+    var stdout = result.stdout;
+    var lines = stdout.toString().split("\n");
+    var line = lines.firstWhere((element) {
+      // NOTE: 显卡默认显示为 `VGA`
+      var check = element.contains("VGA");
+      return check;
+    });
+    if (line.length <= 0) return unknown;
+    var sp_lists = line.split(":");
+    if (sp_lists.length <= 2) return unknown;
+    var item = sp_lists[2];
+    var tmp0 = item.split("[");
+    List<String> r = [];
+    tmp0.forEach((element) {
+      if (element.contains("]")) {
+        r.add(element);
+      }
+    });
+    if (r.length <= 0) return unknown;
+    var t = r[r.length - 1].split("]");
+    if (t.length <= 0) return unknown;
+    return t[0];
+    // var brands = ["Intel", "NVIDIA", "AMD", "Radeon", "QXL"];
+    // var brand = brands.firstWhere((element) {
+    //   return line.contains(element);
+    // });
+    // if (brand.length <= 0) return unknown;
   }
 }
