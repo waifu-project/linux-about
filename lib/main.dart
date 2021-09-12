@@ -27,7 +27,7 @@ class AboutApp extends StatefulWidget {
 }
 
 class _AboutAppState extends State<AboutApp> {
-  configToolbar _page = configToolbar.overflow;
+  configToolbar _page = configToolbar.display;
 
   @override
   Widget build(BuildContext context) {
@@ -83,9 +83,9 @@ class _AboutAppState extends State<AboutApp> {
                                           isHover: item['action'] == _page,
                                           text: item['title'],
                                           onTap: () {
-                                            configToolbar action =
-                                                item['action'];
-                                            print(action);
+                                            setState(() {
+                                              _page = item['action'];
+                                            });
                                           },
                                         );
                                       }).toList(),
@@ -100,7 +100,7 @@ class _AboutAppState extends State<AboutApp> {
                     ),
                     Expanded(
                       child: IndexedStack(
-                        index: configToolbar.overflow.index,
+                        index: _page.index,
                         children: Config.toolbar
                             .map((e) => e['page'] as Widget)
                             .toList(),

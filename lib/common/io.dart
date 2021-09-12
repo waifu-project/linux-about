@@ -2,6 +2,8 @@
 
 import 'dart:io';
 
+import 'dart:math';
+
 import 'package:linux_system_info/linux_system_info.dart';
 
 import 'package:about/common/utils.dart';
@@ -79,5 +81,57 @@ class KitIO {
     //   return line.contains(element);
     // });
     // if (brand.length <= 0) return unknown;
+  }
+
+  /// 获取尺寸大小(mm => inch)
+  static String get displayInch {
+    var _result = Process.runSync("xrandr", []).stdout;
+    var _line = _result.toString().split("\n").firstWhere((element) {
+      return element.contains(" connected");
+    });
+    List<String> _r = [];
+    var _arr = _line.split(" ");
+    _arr.forEach((element) {
+      if (element.contains("mm")) {
+        _r.add(element.replaceFirst("mm", ""));
+      }
+    });
+    if (_r.length != 2) return unknown;
+    var w = int.parse(_r[0]);
+    var h = int.parse(_r[1]);
+    // https://github.com/libredeb/comice-about/blob/ed78af0d86627405ad9ce271cd756db7d5b041b3/src/functions/GetInch.vala#L32
+    if (w == 0 || h == 0) return unknown;
+    int w2 = w * w;
+    int h2 = h * h;
+    var _r2 = (w2 + h2);
+    var b = sqrt(_r2) / 25.4;
+    var c = b.round();
+    return '$c-inch';
+  }
+
+  /// 获取屏幕大小
+  static String get displaySize {
+    var _r = Process.runSync("xdpyinfo", []).stdout.toString();
+    var _l = _r.split("\n").firstWhere((element) {
+      return element.contains("dimensions");
+    });
+    var _bbr = _l.split(" ");
+    var _copyR = _bbr.firstWhere((element) {
+      var now = element.trim();
+      if (now.length <= 1) return false;
+      var s = now[0];
+      var e = now[now.length - 1];
+
+      /// NOTE:
+      ///   => 最低效的算法, 通过判断索引[0, x.lenght-1]两值是否为数字
+      var _r = [false, false];
+      [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 0].forEach((element) {
+        var _s = element.toString();
+        if (s == _s) _r[0] = true;
+        if (e == _s) _r[1] = true;
+      });
+      return !(!_r[0] || !_r[1]);
+    });
+    return _copyR;
   }
 }
