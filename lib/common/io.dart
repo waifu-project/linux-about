@@ -1,5 +1,4 @@
-// read /etc/*release file
-
+import 'dart:convert';
 import 'dart:io';
 
 import 'dart:math';
@@ -9,6 +8,14 @@ import 'package:linux_system_info/linux_system_info.dart';
 import 'package:about/common/utils.dart';
 
 const unknown = "unknown";
+
+enum diskType {
+  HDD,
+  SSD,
+  Unknow,
+}
+
+typedef callMsg = void Function(int x);
 
 class KitIO {
   /// get release info file
@@ -133,5 +140,62 @@ class KitIO {
       return !(!_r[0] || !_r[1]);
     });
     return _copyR;
+  }
+
+  /// 获取存储设备信息
+  static Map<String, String> getStorage() {
+    var ref = Process.runSync("df", ["/", "-h"]);
+    if (ref.stderr.toString().length >= 1) return Map();
+    var io = ref.stdout.toString();
+    var _io = io.split("\n");
+    var _line = _io.firstWhere((element) {
+      return !element.contains("Filesystem");
+    });
+    var fork = _line
+        .replaceAll("    ", " ")
+        .replaceAll("   ", " ")
+        .replaceAll("  ", " ")
+        .split(" ");
+    var _m = {
+      "name": fork[0],
+      "size": fork[1],
+      "used": fork[2],
+      "avail": fork[3],
+      "percentage": fork[4],
+    };
+    return _m;
+  }
+
+  /// 获取磁盘设备类型
+  static diskType getDiskType(String pname, {callMsg? callback}) {
+    var pp = pname.split("/");
+    if (pp.length <= 2) return diskType.Unknow;
+    var rname = pp[2];
+    var blk = Process.runSync("lsblk", ["-b", "-J"]);
+    var res = jsonDecode(blk.stdout.toString());
+    if (res == null) return diskType.Unknow;
+    List<dynamic> devices = res['blockdevices'];
+    var _now = devices.firstWhere((element) {
+      dynamic children = element['children'];
+      if (children == null) return false;
+      return children.any((element) {
+        var check = element['name'] == rname;
+        return check;
+      });
+    });
+    if (callback != null) callback(_now['size']);
+    var rootfs = _now['name'];
+    var statFile = "/sys/block/$rootfs/queue/rotational";
+    var out = Process.runSync("cat", [statFile]).stdout.toString().trim();
+    var outCopy = int.tryParse(out);
+    if (outCopy == null) return diskType.Unknow;
+    switch (outCopy) {
+      case 0:
+        return diskType.SSD;
+      case 1:
+        return diskType.HDD;
+      default:
+        return diskType.Unknow;
+    }
   }
 }

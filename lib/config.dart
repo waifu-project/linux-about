@@ -1,5 +1,6 @@
 import 'package:about/pages/display.dart';
 import 'package:about/pages/overflow.dart';
+import 'package:about/pages/storage.dart';
 
 enum configToolbar {
   overflow,
@@ -25,7 +26,7 @@ class Config {
     {
       "title": "storage",
       "action": configToolbar.storage,
-      "page": new OverflowPage(),
+      "page": new StoragePage(),
     },
     {
       "title": "memory",
