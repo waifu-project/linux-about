@@ -1,4 +1,5 @@
 import 'package:about/pages/display.dart';
+import 'package:about/pages/memory.dart';
 import 'package:about/pages/overflow.dart';
 import 'package:about/pages/storage.dart';
 
@@ -31,7 +32,7 @@ class Config {
     {
       "title": "memory",
       "action": configToolbar.memory,
-      "page": new OverflowPage(),
+      "page": new MemoryPage(),
     },
   ];
 }

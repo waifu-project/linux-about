@@ -198,4 +198,13 @@ class KitIO {
         return diskType.Unknow;
     }
   }
+
+  /// 获取内存
+  /// TODO
+  ///  => slots
+  ///  => sizes
+  static getMemoryInfo() {
+    var _ = Process.runSync("dmidecode", ["-t", "memory"]);
+    print(_);
+  }
 }

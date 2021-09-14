@@ -27,7 +27,7 @@ class AboutApp extends StatefulWidget {
 }
 
 class _AboutAppState extends State<AboutApp> {
-  configToolbar _page = configToolbar.storage;
+  configToolbar _page = configToolbar.memory;
 
   @override
   Widget build(BuildContext context) {
